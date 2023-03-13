@@ -1,21 +1,38 @@
 import logo from './logo.svg';
 import './App.css';
 import './normal.css';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
+
 
 function App() {
+
+  useEffect( () => {
+    getEngins();
+  },[])
   /* Setting input from user and log from chat */
   const [input, setInput] = useState('');
+  const [currentModel, setCurrentModel] = useState("ada");
+  const [models, setModels] = useState([]);
   const [chatLog, setChatLog] = useState([
     { user: 'gpt', message: 'How can I help you today?' },
     { user: 'me', message: 'I want to use chatgpt today' }
   ]);
-
-
-
-  /*Clear button*/ 
+  
+  useEffect( () => {
+    getEngins();
+  },[])
+  
+  /*method that clears chat log*/ 
   function clearChat() {
     setChatLog([]);
+  }
+
+  function getEngins() {
+    console.log("Fetching engines...");
+    fetch("http://localhost:3080/models")
+      .then(res => res.json())
+      .then(data => setModels(data.models))
+      .catch(error => console.error(error));
   }
 
   /* handleSubmit is function that sends request to server */
@@ -36,7 +53,8 @@ function App() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        message: newChatLog.map((message) => message.message).join('\n')
+        message: newChatLog.map((message) => message.message).join('\n'),
+        currentModel
       })
     });
 
@@ -53,6 +71,21 @@ function App() {
         <div className="side-menu-button" onClick={clearChat}>
           <span  >+</span>
           New chat
+        </div>
+
+        <div className='models'>
+          <select onChange={(e) => {
+            setCurrentModel(e.target.value)
+          } }>
+            {models.map((model, index) => (
+              <option key={model.id} value={model.id}>
+                {model.id}
+
+              </option>
+
+            ))}
+          </select>
+
         </div>
       </aside>
       <section className="chatbox">
