@@ -18,9 +18,7 @@ function App() {
     { user: 'me', message: 'I want to use chatgpt today' }
   ]);
   
-  useEffect( () => {
-    getEngins();
-  },[])
+
   
   /*method that clears chat log*/ 
   function clearChat() {
